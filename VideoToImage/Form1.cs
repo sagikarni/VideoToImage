@@ -1,4 +1,7 @@
 ﻿using AxWMPLib;
+using MediaToolkit;
+using MediaToolkit.Model;
+using MediaToolkit.Options;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,15 +21,7 @@ namespace VideoToImage
         {
             InitializeComponent();
 
-            //using (var engine = new Engine(@"C:\Users\sagik\source\repos\VideoSnapShot\VideoSnapShot\bin\Debug\ffmpeg.exe"))
-            //{
-            //    var mp4 = new MediaFile { Filename = @"C:\Users\sagik\Downloads\GettyImages-527762845.mov" };
-            //    var options = new ConversionOptions { Seek = TimeSpan.FromSeconds(10) };
-            //    var outputFile = new MediaFile { Filename = string.Format("{0}\\image-{1}.jpeg", @"C:\Users\sagik\Downloads\opera autoupdate", 10) };
-
-            //    engine.GetMetadata(mp4);
-            //    engine.GetThumbnail(mp4, outputFile, options);
-            //}
+       
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -39,7 +34,7 @@ namespace VideoToImage
                 var video = (AxWindowsMediaPlayer)pnlVideos.Controls[8 - index];
                 video.URL = (file);
                 video.PlayStateChange += pauseOnFirstFrame;
-
+                video.Tag = file;
                 video.Ctlcontrols.play();
                 index++;
 
@@ -63,5 +58,26 @@ namespace VideoToImage
             };
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            int index = 0;
+            foreach (Control ctl in pnlVideos.Controls)
+            {
+                var video = (AxWindowsMediaPlayer)ctl;
+                
+                using (var engine = new Engine(@"C:\Users\sagik\source\repos\VideoSnapShot\VideoSnapShot\bin\Debug\ffmpeg.exe"))
+                {
+                    var mp4 = new MediaFile { Filename = ctl.Tag.ToString() };
+                    var options = new ConversionOptions { Seek = TimeSpan.FromSeconds(video.Ctlcontrols.currentPosition) };
+                    var outputFile = new MediaFile { Filename = string.Format("{0}\\image-{1}.jpeg", @"C:\Users\sagik\Downloads\output", index) };
+
+                    engine.GetMetadata(mp4);
+                    engine.GetThumbnail(mp4, outputFile, options);
+                }
+                index++;
+
+            }
+
+        }
     }
 }
